@@ -18,17 +18,17 @@ consumes:
 produces:
   - application/json
 paths:
-  /tracks:
+  /search/omnify:
     # binds a127 app logic to a route
-    x-swagger-router-controller: tracks
+    x-swagger-router-controller: search_omnify
     get:
-      description: Returns a list of tracks
+      description: Returns a list of search results
       # used as the method name of the controller
-      operationId: getTracks
+      operationId: getOmnifySearch
       parameters:
-        - name: searchTerm
+        - name: q
           in: query
-          description: The search term for the tracks you want
+          description: The search term
           required: true
           type: string
       responses:
@@ -36,7 +36,7 @@ paths:
           description: Success
           schema:
             # a pointer to a definition
-            $ref: "#/definitions/TracksResponse"
+            $ref: "#/definitions/SearchResultsResponse"
         # responses may fall through to errors
         default:
           description: Error
@@ -46,19 +46,34 @@ paths:
     x-swagger-pipe: swagger_raw
 # complex objects have schema definitions
 definitions:
-  TracksResponse:
+  SearchResultsResponse:
     required:
-      - tracks
+      - results
     properties:
-      tracks:
+      results:
         type: array
         items:
-            $ref: "#/definitions/Track"
-  Track:
+            $ref: "#/definitions/SearchResult"
+  SearchResult:
     required:
       - trackName
+      - trackArtist
+      - trackImageUrl
+      - trackUrl
+      - trackLength
+      - trackBpm
     properties:
       trackName:
+        type: string
+      trackArtist:
+        type: string
+      trackImageUrl:
+        type: string
+      trackUrl:
+        type: string
+      trackLength:
+        type: string
+      trackBpm:
         type: string
   ErrorResponse:
     required:
