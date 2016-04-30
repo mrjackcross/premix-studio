@@ -9,6 +9,8 @@
     "async": "^2.0.0-rc.3",
     "bluebird": "^3.3.5",
     "express": "^4.12.3",
+    "http-proxy": "^1.13.2",
+    "https": "^1.0.0",
     "request": "^2.72.0",
     "swagger-express-mw": "^0.1.0"
   },

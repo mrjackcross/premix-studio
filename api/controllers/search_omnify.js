@@ -11,10 +11,8 @@ var omniAudioUri = '/1/content/audio/trusted/';
 var audioEncoding = '320-heaac-3gpp'; // doesn't have to be this one
 var audioParams = '?countryCode=US&customerId=T_jcross&apiKey=' + Config.omniAppKey;
 
-
 var results = [];
 var spotifyAccessToken = '';
-
 /**
  *
  * Omnify search uses a combination of Spotify and Omnifone
@@ -26,6 +24,7 @@ function getOmnifySearch(req, res) {
     var searchTerm = req.swagger.params.q.value;
     var spotifySearchUri = 'search?type=track&limit=10&q=' + searchTerm;
 
+
     request.post({
         url: spotifyAuthUrl,
         headers: {
@@ -36,8 +35,6 @@ function getOmnifySearch(req, res) {
             grant_type: 'client_credentials'
         }
     }, function (err, res, body) {
-
-        console.log(res);
 
         var body = JSON.parse(body);
 
@@ -59,15 +56,17 @@ function getOmnifySearch(req, res) {
             var omniUrls = body.tracks.items.map(function (track) {
 
                 var result = {
+                    id: track.id,
                     trackName: track.name,
                     trackArtist: track.artists[0].name,
                     trackImageUrl: track.album.images[2].url,
                     trackLength: track.duration_ms,
+                    trackPreviewUrl: track.preview_url
                 };
 
                 results.push(result);
 
-                var matchTerm = (track.name + ' ' + track.artists[0].name).replace('&', '');
+                var matchTerm = (track.artists[0].name + ' ' + track.name).replace(/[^A-Za-z0-9 ]/g, '');
                 return encodeURI(Config.omniEndPoint + omniSearchUri + '&query=' + matchTerm + '&apiKey=' + Config.omniAppKey);
             });
 
@@ -86,6 +85,8 @@ function getOmnifySearch(req, res) {
                     getOmnifySearchResponse.json({
                         results: results
                     });
+                    results = [];
+                    spotifyAccessToken = '';
                 });
 
             });
@@ -100,9 +101,12 @@ function getOmnifoneContentUrl(url, i, callback) {
     request(url, function(err, res, body) {
 
         var body = JSON.parse(body);
+        if(typeof body.trackIds !== 'undefined' && body.trackIds.length > 0) {
         var omniTrackId = body.trackIds[0].trackId;
-
-        results[i].trackUrl = Config.omniEndPoint + omniAudioUri + audioEncoding + '/urls/' + omniTrackId + '.json' + audioParams;
+            results[i].trackUrl = Config.omniEndPoint + omniAudioUri + audioEncoding + '/urls/' + omniTrackId + '.json' + audioParams;
+        } else {
+            results[i].trackUrl = 'Not Available';
+        }
 
         callback();
 
@@ -119,17 +123,15 @@ function getAudioFeatures(url, i, callback) {
         }
     }, function(err, res, body) {
 
-
-
         var body = JSON.parse(body);
 
-        console.log(body);
+        if(body.tempo) {
+            var trackBpm = body.tempo;
+        } else {
+            var trackBpm = 'Not Available';
+        }
 
-
-        var trackBpm = body.tempo;
         results[i].trackBpm = trackBpm;
-
-        //console.log(results[i]);
 
         callback();
 
