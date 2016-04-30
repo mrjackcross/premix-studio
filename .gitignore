@@ -1,4 +1,3 @@
-/config/config.js
 # IDE files
 .idea
 
@@ -33,4 +32,4 @@ node_modules
 
 # Runtime configuration for swagger app
 config/runtime.yaml
-config/config.js
+/config/config.js
