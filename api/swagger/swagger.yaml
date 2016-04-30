@@ -72,9 +72,9 @@ definitions:
       trackUrl:
         type: string
       trackLength:
-        type: string
+        type: integer
       trackBpm:
-        type: string
+        type: number
   ErrorResponse:
     required:
       - message
